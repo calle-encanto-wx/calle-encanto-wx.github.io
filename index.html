@@ -157,7 +157,6 @@ async function load(){
       document.getElementById('dirlabel').textContent=compass(d.wind_dir);
     } else { document.getElementById('dirlabel').textContent='calm'; }
     if(d.fc_hi!=null){document.getElementById('hilo').textContent='';}
-    document.getElementById('maxgust').textContent=d.gust10_mph!=null?Math.round(d.gust10_mph):'--';
     if(d.rain_month_in!=null){
       document.getElementById('rainmo').textContent=d.rain_month_in.toFixed(2)+'"';
       document.getElementById('rainyr').textContent=(d.rain_year_in!=null?d.rain_year_in.toFixed(2)+'" this year':'');
