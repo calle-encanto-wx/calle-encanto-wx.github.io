@@ -69,9 +69,11 @@
   <div class="card"><div class="label">Humidity</div><div class="big" id="hum">--%</div><div class="small" id="dew"></div></div>
   <div class="card"><div class="label">Rain Today</div><div class="big" id="rain">--"</div><div class="small" id="rainrate"></div></div>
   <div class="card"><div class="label">Barometer</div><div class="big" id="bar">--</div><div class="small" id="bartrend"></div></div>
-  <div class="card"><div class="label">Max Gust Today</div><div class="big" id="maxgust">--</div><div class="small">mph</div></div>
+  <div class="card"><div class="label">Gusts</div><div class="big" id="maxgust">--</div><div class="small">mph · last 10 min</div></div>
   <div class="card"><div class="label">Rain This Month</div><div class="big" id="rainmo">--"</div><div class="small" id="rainyr"></div></div>
-  <div class="card" id="aqicard" style="display:none"><div class="label">Air Quality</div><div class="big" id="aqi">--</div><div class="small" id="aqidesc"></div></div>
+  <div class="card"><div class="label">Forecast Today</div><div class="big" id="fchilo">--</div><div class="small" id="fcprecip"></div></div>
+  <div class="card"><div class="label">Sunrise / Sunset</div><div class="big" id="suntimes" style="font-size:clamp(20px,4vw,28px);line-height:1.5">--</div><div class="small"></div></div>
+  <div class="card" id="aqicard" style="display:none"><div class="label">Air Quality</div><div class="big" id="aqi">--</div><div class="small" id="aqidesc"></div><div class="small" style="margin-top:2px">NowCast AQI</div></div>
 </div>
 
 <footer>Updates every ~5 minutes · Arrow and label show the direction the wind is blowing from<br>Powered by a Davis Vantage Pro2 weather station</footer>
@@ -86,6 +88,7 @@ async function load(){
     document.getElementById('temp').textContent=Math.round(d.temp_F)+'°F';
     let feels=d.heat_index_F&&d.temp_F>=80?d.heat_index_F:(d.wind_chill_F&&d.temp_F<=50?d.wind_chill_F:null);
     document.getElementById('feels').textContent=feels?('feels like '+Math.round(feels)+'°F'):'';
+    document.getElementById('hilo').textContent='';
     document.getElementById('hum').textContent=Math.round(d.hum)+'%';
     document.getElementById('dew').textContent='dew point '+Math.round(d.dew_point_F)+'°F';
     document.getElementById('rain').textContent=(d.rain_today_in??0).toFixed(2)+'"';
@@ -99,12 +102,18 @@ async function load(){
       document.getElementById('needle').style.transform='rotate('+d.wind_dir+'deg)';
       document.getElementById('dirlabel').textContent=compass(d.wind_dir);
     } else { document.getElementById('dirlabel').textContent='calm'; }
-    if(d.temp_hi_today!=null)document.getElementById('hilo').textContent='today: '+Math.round(d.temp_hi_today)+'° / '+Math.round(d.temp_lo_today)+'°';
-    if(d.gust_hi_today!=null)document.getElementById('maxgust').textContent=Math.round(d.gust_hi_today);
+    if(d.fc_hi!=null){document.getElementById('hilo').textContent='';}
+    document.getElementById('maxgust').textContent=d.gust10_mph!=null?Math.round(d.gust10_mph):'--';
     if(d.rain_month_in!=null){
       document.getElementById('rainmo').textContent=d.rain_month_in.toFixed(2)+'"';
       document.getElementById('rainyr').textContent=(d.rain_year_in!=null?d.rain_year_in.toFixed(2)+'" this year':'');
     }
+    function ampm(t){let[h,m]=t.split(':').map(Number);const ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap;}
+    if(d.fc_hi!=null){
+      document.getElementById('fchilo').textContent=Math.round(d.fc_hi)+'° / '+Math.round(d.fc_lo)+'°';
+      document.getElementById('fcprecip').textContent=d.fc_precip_pct!=null?(d.fc_precip_pct+'% chance of rain'):'';
+    }
+    if(d.sunrise)document.getElementById('suntimes').innerHTML='🌅 '+ampm(d.sunrise)+'<br>🌇 '+ampm(d.sunset);
     if(d.aqi!=null){
       document.getElementById('aqicard').style.display='';
       document.getElementById('aqi').textContent=Math.round(d.aqi);
