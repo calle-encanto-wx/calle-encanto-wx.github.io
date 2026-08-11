@@ -72,7 +72,7 @@
   <div class="card"><div class="label">Humidity</div><div class="big" id="hum">--%</div><div class="small" id="dew"></div></div>
   <div class="card"><div class="label">Rain Today</div><div class="big" id="rain">--"</div><div class="small" id="rainrate"></div></div>
   <div class="card"><div class="label">Barometer</div><div class="big" id="bar">--</div><div class="small" id="bartrend"></div></div>
-  <div class="card"><div class="label">Gusts</div><div class="big" id="maxgust">--</div><div class="small">mph · last 10 min</div></div>
+  <div class="card"><div class="label">UV Index</div><div class="big" id="uv">--</div><div class="small" id="uvdesc"></div></div>
   <div class="card"><div class="label">Rain This Month</div><div class="big" id="rainmo">--"</div><div class="small" id="rainyr"></div></div>
   <div class="card"><div class="label">Forecast Today</div><div class="big" id="fchilo">--</div><div class="small" id="fcprecip"></div></div>
   <div class="card"><div class="label">Sunrise / Sunset</div><div class="big" id="suntimes" style="font-size:clamp(20px,4vw,28px);line-height:1.5">--</div><div class="small"></div></div>
@@ -145,6 +145,12 @@ async function load(){
     const spd=Math.round(d.wind_avg10_mph??d.wind_mph);
     document.getElementById('windspd').textContent=spd;
     document.getElementById('gust').textContent=d.gust10_mph!=null?Math.round(d.gust10_mph):'--';
+    let uvsrc=d.uv!=null?d.uv:d.uv_now;
+    if(uvsrc!=null){
+      const u=Math.round(uvsrc);
+      document.getElementById('uv').textContent=u;
+      document.getElementById('uvdesc').textContent=u<3?'Low':u<6?'Moderate':u<8?'High':u<11?'Very High':'Extreme';
+    }
     if(d.wind_hist&&d.wind_hist.length){drawWindChart(d.wind_hist);}
     if(d.wind_dir!=null&&spd>0){
       document.getElementById('needle').style.transform='rotate('+d.wind_dir+'deg)';
