@@ -37,7 +37,7 @@
 
 <div class="hero">
   <div class="temp-card">
-    <div class="label" style="color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:1.2px">Temperature</div>
+    <div class="label" style="color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:1.2px">Current Temperature</div>
     <div class="t" id="temp">--°</div>
     <div class="small" id="feels" style="color:var(--dim);font-size:14px;margin-top:8px"></div>
     <div class="small" id="hilo" style="color:var(--dim);font-size:14px;margin-top:4px"></div>
@@ -97,7 +97,7 @@ async function load(){
     document.getElementById('bartrend').textContent='inHg · '+(d.bar_trend>0.01?'rising ↑':d.bar_trend<-0.01?'falling ↓':'steady →');
     const spd=Math.round(d.wind_avg10_mph??d.wind_mph);
     document.getElementById('windspd').textContent=spd;
-    document.getElementById('gust').textContent=d.gust10_mph?(' · gusts '+Math.round(d.gust10_mph)):'';
+    document.getElementById('gust').textContent=d.gust10_mph?(' · gusts '+Math.round(d.gust10_mph)+' (10 min)'):'';
     if(d.wind_dir!=null&&spd>0){
       document.getElementById('needle').style.transform='rotate('+d.wind_dir+'deg)';
       document.getElementById('dirlabel').textContent=compass(d.wind_dir);
