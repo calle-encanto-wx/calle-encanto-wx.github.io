@@ -40,6 +40,7 @@
     <div class="label" style="color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:1.2px">Temperature</div>
     <div class="t" id="temp">--°</div>
     <div class="small" id="feels" style="color:var(--dim);font-size:14px;margin-top:8px"></div>
+    <div class="small" id="hilo" style="color:var(--dim);font-size:14px;margin-top:4px"></div>
   </div>
   <div class="compass-card">
     <div class="label" style="color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px">Wind</div>
@@ -68,10 +69,12 @@
   <div class="card"><div class="label">Humidity</div><div class="big" id="hum">--%</div><div class="small" id="dew"></div></div>
   <div class="card"><div class="label">Rain Today</div><div class="big" id="rain">--"</div><div class="small" id="rainrate"></div></div>
   <div class="card"><div class="label">Barometer</div><div class="big" id="bar">--</div><div class="small" id="bartrend"></div></div>
+  <div class="card"><div class="label">Max Gust Today</div><div class="big" id="maxgust">--</div><div class="small">mph</div></div>
+  <div class="card"><div class="label">Rain This Month</div><div class="big" id="rainmo">--"</div><div class="small" id="rainyr"></div></div>
   <div class="card" id="aqicard" style="display:none"><div class="label">Air Quality</div><div class="big" id="aqi">--</div><div class="small" id="aqidesc"></div></div>
 </div>
 
-<footer>Updates every ~10 minutes · Wind arrow shows where the wind is blowing FROM<br>Powered by a Davis Vantage Pro2 on the roof 🏠</footer>
+<footer>Updates every ~5 minutes · Arrow and label show the direction the wind is blowing from<br>Powered by a Davis Vantage Pro2 weather station</footer>
 
 <script>
 const DIRS=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
@@ -93,9 +96,15 @@ async function load(){
     document.getElementById('windspd').textContent=spd;
     document.getElementById('gust').textContent=d.gust10_mph?(' · gusts '+Math.round(d.gust10_mph)):'';
     if(d.wind_dir!=null&&spd>0){
-      document.getElementById('needle').style.transform='rotate('+(d.wind_dir+180)+'deg)';
+      document.getElementById('needle').style.transform='rotate('+d.wind_dir+'deg)';
       document.getElementById('dirlabel').textContent=compass(d.wind_dir);
     } else { document.getElementById('dirlabel').textContent='calm'; }
+    if(d.temp_hi_today!=null)document.getElementById('hilo').textContent='today: '+Math.round(d.temp_hi_today)+'° / '+Math.round(d.temp_lo_today)+'°';
+    if(d.gust_hi_today!=null)document.getElementById('maxgust').textContent=Math.round(d.gust_hi_today);
+    if(d.rain_month_in!=null){
+      document.getElementById('rainmo').textContent=d.rain_month_in.toFixed(2)+'"';
+      document.getElementById('rainyr').textContent=(d.rain_year_in!=null?d.rain_year_in.toFixed(2)+'" this year':'');
+    }
     if(d.aqi!=null){
       document.getElementById('aqicard').style.display='';
       document.getElementById('aqi').textContent=Math.round(d.aqi);
