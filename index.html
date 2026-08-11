@@ -81,10 +81,11 @@
 
 <div class="card" style="width:100%;max-width:840px;margin-top:12px">
   <div class="label">Wind — Hourly Avg &amp; High Gust (last 12 hours)</div>
-  <svg id="windchart" width="100%" height="190" viewBox="0 0 800 190" preserveAspectRatio="none" style="margin-top:8px"></svg>
+  <svg id="windchart" width="100%" height="230" viewBox="0 0 800 230" preserveAspectRatio="none" style="margin-top:8px"></svg>
   <div style="display:flex;gap:18px;justify-content:center;color:var(--dim);font-size:12px;margin-top:6px">
     <span><span style="display:inline-block;width:10px;height:10px;background:#3f6f9e;border-radius:2px;margin-right:5px"></span>High Gust</span>
     <span><span style="display:inline-block;width:10px;height:10px;background:#e8edf5;border-radius:2px;margin-right:5px"></span>Hourly Avg</span>
+    <span>🧭 arrows point where the wind came from</span>
   </div>
 </div>
 
@@ -95,7 +96,7 @@ const DIRS=["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","
 function compass(d){return DIRS[Math.round(d/22.5)%16];}
 function drawWindChart(hist){
   const svg=document.getElementById('windchart');
-  const W=800,H=190,padB=26,padT=16,padL=6,padR=30;
+  const W=800,H=230,padB=66,padT=16,padL=6,padR=30;
   const maxV=Math.max(10,...hist.map(x=>x.gust))*1.15;
   const n=hist.length, slot=(W-padL-padR)/n, bw=Math.min(16,slot*0.28);
   let s='';
@@ -112,7 +113,18 @@ function drawWindChart(hist){
     s+=`<rect x="${cx+1}" y="${H-padB-ha}" width="${bw}" height="${ha}" fill="#e8edf5" rx="2"/>`;
     s+=`<text x="${cx-bw/2-1}" y="${H-padB-hg-4}" fill="#8b98ac" font-size="11" text-anchor="middle">${Math.round(x.gust)}</text>`;
     const dt=new Date(x.h*1000);let hr=dt.getHours();const ap=hr>=12?'p':'a';hr=hr%12||12;
-    if(i%2===(n%2===0?1:0)||n<=8)s+=`<text x="${cx}" y="${H-8}" fill="#8b98ac" font-size="12" text-anchor="middle">${hr}${ap}</text>`;
+    if(i%2===(n%2===0?1:0)||n<=8)s+=`<text x="${cx}" y="${H-42}" fill="#8b98ac" font-size="12" text-anchor="middle">${hr}${ap}</text>`;
+    // mini compass: circle + arrow showing where wind blows FROM
+    if(x.dir!=null){
+      const cy=H-20,r=11;
+      s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#26324a" stroke-width="1.5"/>`;
+      const a=(x.dir)*Math.PI/180;
+      const tipX=cx+r*0.85*Math.sin(a), tipY=cy-r*0.85*Math.cos(a);
+      const tailX=cx-r*0.55*Math.sin(a), tailY=cy+r*0.55*Math.cos(a);
+      const wingA=a+2.6, wingB=a-2.6, wl=r*0.45;
+      s+=`<line x1="${tailX}" y1="${tailY}" x2="${tipX}" y2="${tipY}" stroke="#5ec8f2" stroke-width="2"/>`;
+      s+=`<polygon points="${tipX},${tipY} ${tipX+wl*Math.sin(wingA)},${tipY-wl*Math.cos(wingA)} ${tipX+wl*Math.sin(wingB)},${tipY-wl*Math.cos(wingB)}" fill="#5ec8f2"/>`;
+    }
   });
   svg.innerHTML=s;
 }
